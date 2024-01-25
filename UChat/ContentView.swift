@@ -1,61 +1,70 @@
 //
-//  ContentView.swift
+//  LoginPage.swift
 //  UChat
 //
-//  Created by hailong on 2024/1/23.
+//  Created by hailong on 2024/1/24.
 //
 
 import SwiftUI
-import SwiftData
 
-struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
-
+struct LoginPages: View {
+    @State private var username: String = ""
+    @State private var password: String = ""
+    @State private var keyboardHeight: CGFloat = 0
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
+        NavigationView {
+            VStack {
+                Spacer(minLength:250) // 用于在顶部留出空间
+                
+                Image(systemName: "person.crop.circle")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 80, height: 80)
+                    .clipped()
+                    .padding(.bottom, 20)
+                
+                TextField("账号", text: $username)
+                    .padding()
+                    .background(Color.secondary.opacity(0.3))
+                    .cornerRadius(5.0)
+                    .padding(.bottom, 20)
+                
+                SecureField("密码", text: $password)
+                    .padding()
+                    .background(Color.secondary.opacity(0.3))
+                    .cornerRadius(5.0)
+                    .padding(.bottom, 20)
+                
+                Button(action: {
+                    // 处理登录逻辑
+                }) {
+                    Text("登录")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(width: 300, height: 50)
+                        .background(Color.blue)
+                        .cornerRadius(15.0)
                 }
-                .onDelete(perform: deleteItems)
+                
+                Spacer(minLength: 350) // 在底部也添加一个Spacer
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
+            .padding()
+            .offset(y: -keyboardHeight / 30) // 根据键盘高度调整偏移
+            .onAppear {
+                NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { notification in
+                    let value = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue
+                    let keyboardFrame = value?.cgRectValue
+                    keyboardHeight = keyboardFrame?.height ?? 0
                 }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
+                
+                NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
+                    keyboardHeight = 0
                 }
             }
-        } detail: {
-            Text("Select an item")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
+            .navigationTitle("深斯写作助手")
         }
     }
 }
 
-#Preview {
-    ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
-}
+
