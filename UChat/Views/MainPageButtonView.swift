@@ -63,14 +63,14 @@ struct MainPageButtonView: View {
         messageText = "" // 清空输入框
         
         // 向后端发送消息并处理响应
-            chatService.sendMessage(tempMessage.text) { responseText in
-                if let index = messages.firstIndex(where: { $0.id == tempMessage.id }) {
-                    print("正在给后端发送消息")
-                    // 更新消息文本
-                    tempMessage.updateText(newText: responseText)
-                    messages[index] = tempMessage
-                }
+        chatService.sendMessage(tempMessage.text) { responseText in
+            if let index = messages.firstIndex(where: { $0.id == tempMessage.id }) {
+                print("正在给后端发送消息")
+                // 更新消息文本
+                tempMessage.updateText(newText: responseText)
+                messages[index] = tempMessage
             }
+        }
     }
 }
 
