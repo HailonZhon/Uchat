@@ -1,70 +1,71 @@
-//
-//  LoginPage.swift
-//  UChat
-//
-//  Created by hailong on 2024/1/24.
-//
-
 import SwiftUI
 
-struct LoginPages: View {
-    @State private var username: String = ""
-    @State private var password: String = ""
-    @State private var keyboardHeight: CGFloat = 0
+struct ContentView: View {
+    @State private var isDrawerOpen: Bool = false
+    let drawerWidth: CGFloat = UIScreen.main.bounds.width * 2 / 3
+    
     var body: some View {
-        NavigationView {
-            VStack {
-                Spacer(minLength:250) // 用于在顶部留出空间
-                
-                Image(systemName: "person.crop.circle")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 80, height: 80)
-                    .clipped()
-                    .padding(.bottom, 20)
-                
-                TextField("账号", text: $username)
-                    .padding()
-                    .background(Color.secondary.opacity(0.3))
-                    .cornerRadius(5.0)
-                    .padding(.bottom, 20)
-                
-                SecureField("密码", text: $password)
-                    .padding()
-                    .background(Color.secondary.opacity(0.3))
-                    .cornerRadius(5.0)
-                    .padding(.bottom, 20)
-                
-                Button(action: {
-                    // 处理登录逻辑
-                }) {
-                    Text("登录")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(width: 300, height: 50)
-                        .background(Color.blue)
-                        .cornerRadius(15.0)
-                }
-                
-                Spacer(minLength: 350) // 在底部也添加一个Spacer
-            }
-            .padding()
-            .offset(y: -keyboardHeight / 30) // 根据键盘高度调整偏移
-            .onAppear {
-                NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { notification in
-                    let value = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue
-                    let keyboardFrame = value?.cgRectValue
-                    keyboardHeight = keyboardFrame?.height ?? 0
-                }
-                
-                NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
-                    keyboardHeight = 0
+        let drag = DragGesture()
+            .onEnded {
+                if $0.translation.width > 100 {
+                    // 如果向右拖动距离超过100，则打开抽屉
+                    withAnimation {
+                        self.isDrawerOpen = true
+                    }
+                } else if $0.translation.width < -100 {
+                    // 如果向左拖动距离超过100，则关闭抽屉
+                    withAnimation {
+                        self.isDrawerOpen = false
+                    }
                 }
             }
-            .navigationTitle("深斯写作助手")
+
+        return GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                MainPageView(isDrawerOpen: self.$isDrawerOpen)
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .offset(x: self.isDrawerOpen ? self.drawerWidth : 0)
+                    .disabled(self.isDrawerOpen)
+                    .gesture(drag)
+                
+                if self.isDrawerOpen {
+                    DrawerView()
+                        .frame(width: self.drawerWidth)
+                        .transition(.move(edge: .leading))
+                }
+            }
         }
     }
 }
 
+struct MainPageView: View {
+    @Binding var isDrawerOpen: Bool
+    
+    var body: some View {
+        // 主页面内容
+        VStack {
+            Button(action: {
+                withAnimation {
+                    self.isDrawerOpen.toggle()
+                }
+            }) {
+                Image(systemName: "line.horizontal.3")
+                    .imageScale(.large)
+                    .foregroundColor(.black)
+            }
+            .padding()
+            // 其他内容...
+        }
+    }
+}
 
+struct DrawerView: View {
+    var body: some View {
+        VStack {
+            // 抽屉视图内容...
+            Text("侧边栏内容")
+            Spacer()
+        }
+        .background(Color.gray.opacity(0.5))
+    }
+}

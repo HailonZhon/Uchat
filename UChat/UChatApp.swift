@@ -26,7 +26,8 @@ struct UChatApp: App {
     var body: some Scene {
         WindowGroup {
 //            ContentView()
-            LoginPage()
+//            LoginPage()
+            MainPageButtonView()
         }
         .modelContainer(sharedModelContainer)
     }
