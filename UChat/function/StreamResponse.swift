@@ -6,21 +6,40 @@
 //
 
 import Foundation
-func sendMessage(_ message: String, model: String, apiKey: String) async {
-    // 构建请求URL和请求体
-    let url = URL(string: "http://127.0.0.1:8000/stream_chat")!
-    var request = URLRequest(url: url)
-    request.httpMethod = "POST"
-    request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-    let body: [String: Any] = ["api_key": apiKey, "model": model, "message": message]
-    request.httpBody = try? JSONSerialization.data(withJSONObject: body)
 
-    // 发送请求并处理响应
-    do {
-        let (data, _) = try await URLSession.shared.data(for: request)
-        // 解析响应数据并更新UI
-        // 注意：这里需要解析数据流，具体实现取决于后端发送的数据格式
-    } catch {
-        print("请求失败: \(error)")
-    }
+import Combine
+
+class ChatService {
+    var cancellables: Set<AnyCancellable> = []
+
+    func sendMessage(_ message: String, completion: @escaping (String) -> Void) {
+            guard let url = URL(string: "http://127.0.0.1:8080/stream_chat") else { return }
+
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.addValue("application/json", forHTTPHeaderField: "Accept")
+
+            let body: [String: String] = [
+                "api_key": "sk-IjqBdKx2iuVNXKRxFbCbE2A9Cd284cE0A2Bd78036e095521",
+                "model": "gpt-4",
+                "message": message
+            ]
+            request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
+
+            // 创建一个 URLSessionDataTask 来处理流式响应
+            let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+                guard let _self = self, let data = data else { return }
+
+                // 直接将接收到的文本数据转换为字符串
+                if let responseString = String(data: data, encoding: .utf8) {
+                    
+                    DispatchQueue.main.async {
+                        completion(responseString)
+                        print(responseString)
+                    }
+                }
+            }
+
+            task.resume()
+        }
 }

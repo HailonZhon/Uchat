@@ -11,8 +11,3 @@ struct LoginRequest: Codable {
     var password: String
     var verification_code: String
 }
-//struct ChatMessage: Identifiable {
-//    let id = UUID()
-//    let username: String
-//    let text: String
-//}

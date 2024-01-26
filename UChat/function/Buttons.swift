@@ -41,13 +41,13 @@ struct TopBarView: View {
     }
 }
 
-// 底部导航栏
 struct BottomBarView: View {
     @Binding var messageText: String
     let actionCamera: () -> Void
     let actionPhoto: () -> Void
     let actionFolder: () -> Void
     let actionAudio: () -> Void
+    let actionSendMessage: () -> Void
     let actionHeadphones: () -> Void
     
     var body: some View {
@@ -63,7 +63,17 @@ struct BottomBarView: View {
 
             Spacer()
             
-            IconButton(iconName: "headphones", action: actionHeadphones)
+            // 根据输入框是否有文本显示不同的按钮
+            if messageText.isEmpty {
+                IconButton(iconName: "headphones", action: actionAudio)
+            } else {
+                Button(action: actionSendMessage) {
+                    Image(systemName: "arrow.up.circle.fill")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 24, height: 24)
+                }
+            }
         }
     }
 }
@@ -80,37 +90,35 @@ struct IconButton: View {
         }
     }
 }
-
 // 消息输入框
 struct MessageTextField: View {
     @Binding var messageText: String
     let actionAudio: () -> Void
-    let sendMessage: () -> Void  // 添加的发送消息回调
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         HStack {
             TextField("消息", text: $messageText)
                 .padding(10)
-                .background(Capsule().fill(Color.white))
+                .background(Capsule().fill(colorScheme == .dark ? Color.black : Color.white))
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
                 .overlay(
                     Capsule().stroke(Color.gray, lineWidth: 1)
                 )
                 .padding(.horizontal, 10)
-
-            Button(action: {
-                sendMessage()  // 调用发送消息回调
-            }){
-                Image(systemName: "paperplane.fill")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 24, height: 24)
-                    .foregroundColor(colorScheme == .dark ? .white : .black)
+            
+            // 当输入框为空时，显示音频按钮
+            if messageText.isEmpty {
+                Button(action: actionAudio) {
+                    Image(systemName: "waveform")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 24, height: 24)
+                        .foregroundColor(colorScheme == .dark ? .white : .black)
+                }
+                .padding(.trailing, 8)
             }
-            .padding(.trailing, 8)
         }
     }
 }
-

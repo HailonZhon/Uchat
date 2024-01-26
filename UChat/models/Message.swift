@@ -6,10 +6,15 @@
 //
 
 import Foundation
-struct Message: Identifiable {
-    let id = UUID()
-    let sender: String
-    let content: String
+struct Message: Decodable, Identifiable {
+    let id: String
+    var text: String
+    var isSending: Bool = false
+
+    // 添加一个更新文本的方法
+    mutating func updateText(newText: String) {
+        self.text = newText
+    }
 }
 
 enum Sender: String {
