@@ -3,15 +3,15 @@
 //  UChat
 //
 //  Created by Midnight Maverick on 2024/1/26.
-//
+//        let apiKey = "sk-IjqBdKx2iuVNXKRxFbCbE2A9Cd284cE0A2Bd78036e095521"
 
 import SwiftUI
 
 struct MainPageButtonView: View {
     @State private var messageText: String = ""
     @Environment(\.colorScheme) var colorScheme
-    @State private var messages: [Message] = [] // 用于存储消息的数组
-    @State private var currentChatGPTMessage: Message?
+    @ObservedObject private var chatViewModel = ChatViewModel()
+    private let chatService = ChatService()
 
     var body: some View {
         VStack {
@@ -24,11 +24,14 @@ struct MainPageButtonView: View {
             })
             .padding(.vertical, 10)
 
-            MessagesView(messages: messages) // 显示消息列表
+            ScrollView {
+                VStack(spacing: 10) {
+                    ForEach(chatViewModel.messages, id: \.id) { message in
+                        MessageView(message: message)
+                    }
+                }
+            }
 
-            Spacer() // 将内容推到底部
-
-            // 底部导航栏
             BottomBarView(
                 messageText: $messageText,
                 actionCamera: {
@@ -54,48 +57,23 @@ struct MainPageButtonView: View {
         }
         .foregroundColor(colorScheme == .dark ? .white : .black)
     }
-    private let chatService = ChatService()
-    // 使用API密钥和模型名称作为参数，根据您的设置来修改这些值
 
     private func sendMessage() {
-        // 用户发送的消息
         let userMessage = Message(id: UUID().uuidString, text: messageText, sender: .user)
-        messages.append(userMessage)
-        messageText = "" // 清空输入框
-        let apiKey = "sk-IjqBdKx2iuVNXKRxFbCbE2A9Cd284cE0A2Bd78036e095521"
-        let model = "gpt-4"
-        // 初始化或更新正在构建的ChatGPT消息
-        let chatGPTMessageId = UUID().uuidString
-        currentChatGPTMessage = Message(id: chatGPTMessageId, text: "", sender: .chatGPT)
+        chatViewModel.messages.append(userMessage)
+        messageText = ""
         
-        // 向后端发送消息并处理流式响应
-        chatService.streamChat(apiKey: apiKey, model: model, message: userMessage.text) { [self] (responseText, isFinal) in
+        chatService.streamChat(apiKey: "sk-IjqBdKx2iuVNXKRxFbCbE2A9Cd284cE0A2Bd78036e095521", model: "gpt-3.5-turbo", message: userMessage.text) { [self] (responseText, isFinal) in
             DispatchQueue.main.async {
-                // 累积构建ChatGPT的回复消息
-                self.currentChatGPTMessage?.text += responseText
-                
-                
                 if isFinal {
-                    // 如果是最后一部分消息，则添加到消息列表中，并重置当前ChatGPT消息
-                    if let completedMessage = self.currentChatGPTMessage {
-                        self.messages.append(completedMessage)
-                        print("添加新消息: \(completedMessage.text)")
-                        self.currentChatGPTMessage = nil
-                    }
-                } else if self.currentChatGPTMessage == nil {
-                    // 如果流式消息还在进行中，但当前消息为空，则初始化它
-                    self.currentChatGPTMessage = Message(id: chatGPTMessageId, text: responseText, sender: .chatGPT)
-                    
+                    let completedMessage = Message(id: UUID().uuidString, text: responseText, sender: .chatGPT)
+                    self.chatViewModel.messages.append(completedMessage)
+                    print("添加新消息: \(completedMessage.text)")
                 }
             }
         }
     }
-
-
 }
-
-
-
 
 #Preview {
     MainPageButtonView()
