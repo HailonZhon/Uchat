@@ -56,20 +56,16 @@ struct MainPageButtonView: View {
     private let chatService = ChatService()
     
     private func sendMessage() {
-        // 1. 创建一个临时消息并显示在界面上
-        var tempMessage = Message(id: UUID().uuidString, text: messageText, isSending: true)
-        print("正在给前端发送消息")
-        messages.append(tempMessage)
+        // 用户发送的消息
+        let userMessage = Message(id: UUID().uuidString, text: messageText, sender: .user)
+        messages.append(userMessage)
         messageText = "" // 清空输入框
-        
+
         // 向后端发送消息并处理响应
-        chatService.sendMessage(tempMessage.text) { responseText in
-            if let index = messages.firstIndex(where: { $0.id == tempMessage.id }) {
-                print("正在给后端发送消息")
-                // 更新消息文本
-                tempMessage.updateText(newText: responseText)
-                messages[index] = tempMessage
-            }
+        chatService.sendMessage(userMessage.text) { responseText in
+            // ChatGPT的回复
+            let chatGPTMessage = Message(id: UUID().uuidString, text: responseText, sender: .chatGPT)
+            messages.append(chatGPTMessage)
         }
     }
 }

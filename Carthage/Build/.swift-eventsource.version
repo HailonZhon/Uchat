@@ -1,0 +1,19 @@
+{
+  "iOS" : [
+    {
+      "name" : "LDSwiftEventSource",
+      "swiftToolchainVersion" : "5.9.2 (swiftlang-5.9.2.2.56 clang-1500.1.0.2.5)",
+      "container" : "LDSwiftEventSource.xcframework",
+      "identifier" : "ios-arm64",
+      "hash" : "9137a3700946603f2e03b3fb6f8da5b662468c177a557e597cdf39a1a9a13716"
+    },
+    {
+      "name" : "LDSwiftEventSource",
+      "identifier" : "ios-arm64_x86_64-simulator",
+      "container" : "LDSwiftEventSource.xcframework",
+      "hash" : "69ba3edf67e2364847f4efdc2c057dfab10a14573c9d6c816e7de505d1f0d51e",
+      "swiftToolchainVersion" : "5.9.2 (swiftlang-5.9.2.2.56 clang-1500.1.0.2.5)"
+    }
+  ],
+  "commitish" : "3.1.1"
+}

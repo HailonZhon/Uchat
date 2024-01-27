@@ -6,18 +6,17 @@
 //
 
 import Foundation
-struct Message: Decodable, Identifiable {
+struct Message: Identifiable, Decodable {
     let id: String
     var text: String
-    var isSending: Bool = false
+    var sender: Sender
 
-    // 添加一个更新文本的方法
+    enum Sender: String, Decodable {
+        case user = "USER"
+        case chatGPT = "CHATGPT"
+    }
+
     mutating func updateText(newText: String) {
         self.text = newText
     }
-}
-
-enum Sender: String {
-    case user = "USER"
-    case chatGPT = "ChatGPT"
 }

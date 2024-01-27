@@ -8,12 +8,21 @@
 import Foundation
 
 import Combine
-
+import LDSwiftEventSource
 class ChatService {
     var cancellables: Set<AnyCancellable> = []
     
     func sendMessage(_ message: String, completion: @escaping (String) -> Void) {
-        guard let url = URL(string: "http://127.0.0.1:8080/stream_chat") else {
+        // 构造带有查询参数的URL
+        var components = URLComponents(string: "http://127.0.0.1:8000/stream_chat")
+        let queryItems = [
+            URLQueryItem(name: "api_key", value: "sk-IjqBdKx2iuVNXKRxFbCbE2A9Cd284cE0A2Bd78036e095521"),
+            URLQueryItem(name: "model", value: "gpt-4"),
+            URLQueryItem(name: "message", value: message)
+        ]
+        components?.queryItems = queryItems
+
+        guard let url = components?.url else {
             print("URL构建失败")
             return
         }
@@ -21,16 +30,9 @@ class ChatService {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Accept")
-        
-        let body: [String: String] = [
-            "api_key": "sk-IjqBdKx2iuVNXKRxFbCbE2A9Cd284cE0A2Bd78036e095521",
-            "model": "gpt-4",
-            "message": message
-        ]
-        request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
-        print("请求准备完成，即将发送")
-        
-        _ = URLSession.shared.dataTask(with: request) { data, response, error in
+
+        printRequestDetails(request: request)
+        URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("请求错误: \(error.localizedDescription)")
                 return
@@ -61,7 +63,12 @@ class ChatService {
             } else {
                 print("无法解码响应数据")
             }
-        }
+        }.resume()
     }
     
+}
+private func printRequestDetails(request: URLRequest) {
+    print("请求URL: \(request.url?.absoluteString ?? "无URL")")
+    print("请求方法: \(request.httpMethod ?? "无方法")")
+    print("请求头部: \(request.allHTTPHeaderFields ?? [:])")
 }
