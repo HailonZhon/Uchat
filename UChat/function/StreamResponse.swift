@@ -7,68 +7,72 @@
 
 import Foundation
 
-import Combine
-import LDSwiftEventSource
 class ChatService {
-    var cancellables: Set<AnyCancellable> = []
-    
-    func sendMessage(_ message: String, completion: @escaping (String) -> Void) {
-        // 构造带有查询参数的URL
-        var components = URLComponents(string: "http://127.0.0.1:8000/stream_chat")
-        let queryItems = [
-            URLQueryItem(name: "api_key", value: "sk-IjqBdKx2iuVNXKRxFbCbE2A9Cd284cE0A2Bd78036e095521"),
-            URLQueryItem(name: "model", value: "gpt-4"),
-            URLQueryItem(name: "message", value: message)
-        ]
-        components?.queryItems = queryItems
-
-        guard let url = components?.url else {
+    var dataTask: URLSessionDataTask?
+    var currentMessageContent: String = ""
+    func streamChat(apiKey: String, model: String, message: String, onReceive: @escaping (String, Bool) -> Void) {
+        print("准备构建URL")
+        guard let url = URL(string: "http://127.0.0.1:8000/stream_chat") else {
             print("URL构建失败")
             return
         }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.addValue("application/json", forHTTPHeaderField: "Accept")
 
-        printRequestDetails(request: request)
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        print("正在添加查询参数")
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        components?.queryItems = [
+            URLQueryItem(name: "api_key", value: apiKey),
+            URLQueryItem(name: "model", value: model),
+            URLQueryItem(name: "message", value: message)
+        ]
+
+        guard let finalURL = components?.url else {
+            print("构建带查询参数的URL失败")
+            return
+        }
+
+        print("构建HTTP请求")
+        var request = URLRequest(url: finalURL)
+        request.httpMethod = "POST"
+        request.addValue("text/event-stream", forHTTPHeaderField: "Accept")
+
+        print("开始执行数据任务")
+        dataTask = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+            guard let self = self else { return }
+
             if let error = error {
                 print("请求错误: \(error.localizedDescription)")
                 return
             }
-            
-            guard let response = response as? HTTPURLResponse else {
-                print("无法获取HTTP响应")
+
+            guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
+                print("服务器返回非200状态码")
                 return
             }
-            
-            print("收到响应，状态码：\(response.statusCode)")
-            
-            if response.statusCode != 200 {
-                print("服务器返回错误状态码：\(response.statusCode)")
-                return
-            }
-            
-            guard let data = data else {
-                print("无响应数据")
-                return
-            }
-            
-            if let responseString = String(data: data, encoding: .utf8) {
-                DispatchQueue.main.async {
-                    completion(responseString)
-                    print("收到响应数据：\(responseString)")
+
+            if let data = data, let responseString = String(data: data, encoding: .utf8) {
+                print("接收到流式数据: \(responseString)")
+                self.parseSSEData(responseString) { message, isFinal in
+                    // 确保 `onReceive` 闭包有两个参数
+                    onReceive(message, isFinal)
                 }
-            } else {
-                print("无法解码响应数据")
+            }else {
+                print("未接收到数据")
             }
-        }.resume()
+        }
+        dataTask?.resume()
     }
-    
-}
-private func printRequestDetails(request: URLRequest) {
-    print("请求URL: \(request.url?.absoluteString ?? "无URL")")
-    print("请求方法: \(request.httpMethod ?? "无方法")")
-    print("请求头部: \(request.allHTTPHeaderFields ?? [:])")
+
+    private func parseSSEData(_ data: String, onReceive: (String, Bool) -> Void) {
+        // 假设服务器发送的每个消息块都以"data: "开头，以"\n\n"结束
+        let events = data.components(separatedBy: "\n\n")
+        for event in events {
+            if event.hasPrefix("data: ") {
+                let message = String(event.dropFirst("data: ".count))
+                onReceive(message, false)  // 传递 false，表示消息还未结束
+            } else if event == "streaming-ended" {
+                onReceive("", true)  // 传递 true，表示消息结束
+            }
+        }
+    }
+
 }
