@@ -97,28 +97,26 @@ struct MessageTextField: View {
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
-            HStack {
-                TextField("消息", text: $messageText)
-                    .padding(10)
-                    .background(Capsule().fill(colorScheme == .dark ? Color.black : Color.white))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .overlay(
-                        Capsule().stroke(Color.gray, lineWidth: 1)
-                    )
-                    .padding(.horizontal, 10)
-                
-                // 当输入框为空时，显示音频按钮
-                if messageText.isEmpty {
-                    Button(action: actionAudio) {
-                        Image(systemName: "waveform")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 24, height: 24)
-                            .foregroundColor(colorScheme == .dark ? .white : .black)
-                    }
-                    .padding(.trailing, 8)
+        HStack {
+            TextField("消息", text: $messageText)
+                .padding(10)
+                .background(Capsule().fill(colorScheme == .dark ? Color.black : Color.white))
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+            
+            // 当输入框为空时，显示音频按钮
+            if messageText.isEmpty {
+                Button(action: actionAudio) {
+                    Image(systemName: "waveform")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 20, height: 20)
+                }.padding(.leading, -25) // 使用负边距将音频按钮向左移动
             }
         }
+        .overlay(
+            Capsule().stroke(Color.gray, lineWidth: 1)
+        )
+        .padding(.horizontal, 10)
     }
 }

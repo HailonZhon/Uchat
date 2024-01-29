@@ -6,24 +6,11 @@
 //
 
 import Foundation
-//struct Message: Identifiable, Decodable {
-//    let id: String
-//    var text: String
-//    var sender: Sender
-//
-//    enum Sender: String, Decodable {
-//        case user = "USER"
-//        case chatGPT = "CHATGPT"
-//    }
-//
-//    mutating func updateText(newText: String) {
-//        self.text = newText
-//    }
-//}
 // 定义一个 ObservableObject 类来管理消息
 class ChatViewModel: ObservableObject {
     @Published var messages: [Message] = [
-        Message(id: UUID().uuidString, text: "测试消息", sender: .chatGPT) // 测试数据
+        Message(id: UUID().uuidString, text: "测试消息", sender: .chatGPT), //测试数据
+        Message(id: UUID().uuidString, text: "测试消息", sender: .chatGPT) //测试数据
     ]
 }
 

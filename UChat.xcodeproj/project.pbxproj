@@ -11,7 +11,6 @@
 		8BA4F7D72B6344AB001F2859 /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA4F7D62B6344AB001F2859 /* Buttons.swift */; };
 		8BA4F7D92B63771C001F2859 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA4F7D82B63771C001F2859 /* ChatView.swift */; };
 		8BA4F7DB2B63772D001F2859 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA4F7DA2B63772D001F2859 /* Message.swift */; };
-		8BA4F7DD2B637CA6001F2859 /* StreamResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA4F7DC2B637CA6001F2859 /* StreamResponse.swift */; };
 		8BA4F7E02B64970B001F2859 /* LDSwiftEventSource.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BA4F7DF2B64970B001F2859 /* LDSwiftEventSource.xcframework */; };
 		8BA4F7E12B64970B001F2859 /* LDSwiftEventSource.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8BA4F7DF2B64970B001F2859 /* LDSwiftEventSource.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D95D712B2B6125A700E21283 /* LoginPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95D712A2B6125A700E21283 /* LoginPage.swift */; };
@@ -64,7 +63,6 @@
 		8BA4F7D62B6344AB001F2859 /* Buttons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
 		8BA4F7D82B63771C001F2859 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		8BA4F7DA2B63772D001F2859 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
-		8BA4F7DC2B637CA6001F2859 /* StreamResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamResponse.swift; sourceTree = "<group>"; };
 		8BA4F7DF2B64970B001F2859 /* LDSwiftEventSource.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = LDSwiftEventSource.xcframework; path = Carthage/Build/LDSwiftEventSource.xcframework; sourceTree = "<group>"; };
 		D95D712A2B6125A700E21283 /* LoginPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginPage.swift; sourceTree = "<group>"; };
 		D9BC93EC2B6170450083B930 /* model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = model.swift; sourceTree = "<group>"; };
@@ -141,7 +139,6 @@
 			children = (
 				D9BC93EF2B6170930083B930 /* login.swift */,
 				8BA4F7D62B6344AB001F2859 /* Buttons.swift */,
-				8BA4F7DC2B637CA6001F2859 /* StreamResponse.swift */,
 			);
 			path = function;
 			sourceTree = "<group>";
@@ -347,7 +344,6 @@
 				8BA4F7D92B63771C001F2859 /* ChatView.swift in Sources */,
 				D9DDCB192B5F8FFF00310FA7 /* ContentView.swift in Sources */,
 				D9DDCB1B2B5F8FFF00310FA7 /* Item.swift in Sources */,
-				8BA4F7DD2B637CA6001F2859 /* StreamResponse.swift in Sources */,
 				8BA4F7DB2B63772D001F2859 /* Message.swift in Sources */,
 				D9DDCB172B5F8FFF00310FA7 /* UChatApp.swift in Sources */,
 				8BA4F7D72B6344AB001F2859 /* Buttons.swift in Sources */,
